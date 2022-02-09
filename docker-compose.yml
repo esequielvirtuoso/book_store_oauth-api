@@ -1,0 +1,36 @@
+version: '3'
+networks:
+  my-network-name:
+    name: ${NETWORK_NAME}
+    driver: bridge
+services:
+  cassandra:
+    container_name: ${CASSANDRA_NAME}
+    image: cassandra:3.11.2
+    ports:
+      - 9043:9042
+    environment:
+      - "MAX_HEAP_SIZE=256M"
+      - "HEAP_NEWSIZE=128M"
+    restart: always
+    networks:
+      - my-network-name
+    volumes:
+      - ${PWD}/out/cassandra_data:/var/lib/cassandra
+      - ${PWD}/scripts/cassandra_schema.cql:/schema.cql
+    healthcheck:
+        test: ["CMD", "cqlsh", "-u cassandra", "-p cassandra" ,"-e describe keyspaces"]
+        interval: 20s
+        timeout: 10s
+        retries: 10
+
+  cassandra-load-keyspace:
+    container_name: cassandra-load-keyspace
+    image: cassandra:3.11.2
+    depends_on:
+      - cassandra
+    networks:
+      - my-network-name
+    volumes:
+      - ${PWD}/scripts/cassandra_schema.cql:/schema.cql
+    command: /bin/bash -c "sleep 60 && echo [book_store_oauth-api]Loading cassandra keyspace... && cqlsh cassandra -f /schema.cql"
