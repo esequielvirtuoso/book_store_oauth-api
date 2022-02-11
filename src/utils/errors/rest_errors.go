@@ -56,3 +56,17 @@ func NewInternalServerError(message string) *RestErr {
 		Error:   "internal_server_error",
 	}
 }
+
+/* NewUnauthorized returns a standardized struct with the correct status,
+*  and error tag for unauthorized access situations
+*  Args:
+*  message (string): The message to be assigned to the struct's Message field
+ */
+func NewUnauthorized(message string) *RestErr {
+	return &RestErr{
+		Message: message,
+		Status:  http.StatusUnauthorized,
+		Error:   "unauthorized",
+	}
+}
+

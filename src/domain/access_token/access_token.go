@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	expirationTime             = 24
+	expirationTime             = 30
 	grantTypePassword          = "password"
 	grantTypeClientCredentials = "client_credentials"
 )
@@ -55,7 +55,7 @@ type AccessToken struct {
 func GetNewAccessToken(userID int64) AccessToken {
 	return AccessToken{
 		UserID:  userID,
-		Expires: time.Now().UTC().Add(expirationTime * time.Hour).Unix(),
+		Expires: time.Now().UTC().Add(expirationTime * time.Minute).Unix(),
 	}
 }
 

@@ -44,6 +44,11 @@ func (s *service) GetById(accessTokenID string) (*accesstoken.AccessToken, *erro
 	if err != nil {
 		return nil, err
 	}
+
+	if accessToken.IsExpired() {
+		return nil, errors.NewUnauthorized("access token id has expired")
+	}
+
 	return accessToken, nil
 }
 
