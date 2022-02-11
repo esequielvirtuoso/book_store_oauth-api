@@ -17,6 +17,7 @@ coverage/
 # vendor/
 
 ### Go Patch ###
+/out/
 /vendor/
 /Godeps/
 
