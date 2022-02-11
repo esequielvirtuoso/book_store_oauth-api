@@ -69,3 +69,4 @@ func NewUnauthorized(message string) *RestErr {
 		Error:   "unauthorized",
 	}
 }
+
