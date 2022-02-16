@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	cryptoUtils "github.com/esequielvirtuoso/book_store_oauth-api/src/utils/crypto_utils"
-	"github.com/esequielvirtuoso/book_store_oauth-api/src/utils/errors"
+	cryptoutils "github.com/esequielvirtuoso/go_utils_lib/crypto"
+	restErrors "github.com/esequielvirtuoso/go_utils_lib/rest_errors"
 )
 
 const (
@@ -30,14 +30,14 @@ type AccessTokenRequest struct {
 	ClientSecret string `json:"client_secret"`
 }
 
-func (at *AccessTokenRequest) Validate() *errors.RestErr {
+func (at *AccessTokenRequest) Validate() *restErrors.RestErr {
 	switch at.GrantType {
 	case grantTypePassword:
 		break
 	case grantTypeClientCredentials:
 		break
 	default:
-		return errors.NewBadRequestError("invalid grant_type")
+		return restErrors.NewBadRequestError("invalid grant_type")
 	}
 	// TODO: Validate parameters for each grant_type
 	return nil
@@ -65,21 +65,21 @@ func (at *AccessToken) IsExpired() bool {
 }
 
 // Validate function verify if access token is valid or not
-func (at *AccessToken) Validate() *errors.RestErr {
+func (at *AccessToken) Validate() *restErrors.RestErr {
 	at.AccessToken = strings.TrimSpace(at.AccessToken)
 	if at.AccessToken == "" {
-		return errors.NewBadRequestError("invalid access token id")
+		return restErrors.NewBadRequestError("invalid access token id")
 	}
 
 	if at.UserID <= 0 {
-		return errors.NewBadRequestError("invalid user id")
+		return restErrors.NewBadRequestError("invalid user id")
 	}
 	if at.AppClientID <= 0 {
-		return errors.NewBadRequestError("invalid client id")
+		return restErrors.NewBadRequestError("invalid client id")
 	}
 	return nil
 }
 
 func (at *AccessToken) Generate() {
-	at.AccessToken = cryptoUtils.GetSha256(fmt.Sprintf("at-%d-%d-ran", at.UserID, at.Expires))
+	at.AccessToken = cryptoutils.GetSha256(fmt.Sprintf("at-%d-%d-ran", at.UserID, at.Expires))
 }
