@@ -35,19 +35,19 @@ func (c *usersClient) LoginUser(email string, password string) (*users.User, res
 	}
 	response := usersRestClient.Post("/users/login", request)
 	if response == nil || response.Response == nil {
-		return nil, restErrors.NewInternalServerError("invalid rest client response when trying to login user")
+		return nil, restErrors.NewInternalServerError("invalid rest client response when trying to login user", nil)
 	}
 	if response.StatusCode > 299 {
 		var restErr restErrors.RestErr
 		if err := json.Unmarshal(response.Bytes(), &restErr); err != nil {
-			return nil, restErrors.NewInternalServerError("invalid error interface when trying to login user")
+			return nil, restErrors.NewInternalServerError("invalid error interface when trying to login user", err)
 		}
 		return nil, restErr
 	}
 
 	var user users.User
 	if err := json.Unmarshal(response.Bytes(), &user); err != nil {
-		return nil, restErrors.NewInternalServerError("error when trying to unmarshal users response")
+		return nil, restErrors.NewInternalServerError("error when trying to unmarshal users response", err)
 	}
 	return &user, nil
 }
