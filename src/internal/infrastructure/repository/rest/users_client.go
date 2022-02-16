@@ -19,7 +19,7 @@ var (
 )
 
 type UsersClient interface {
-	LoginUser(string, string) (*users.User, *restErrors.RestErr)
+	LoginUser(string, string) (*users.User, restErrors.RestErr)
 }
 
 type usersClient struct{}
@@ -28,7 +28,7 @@ func NewClient() UsersClient {
 	return &usersClient{}
 }
 
-func (c *usersClient) LoginUser(email string, password string) (*users.User, *restErrors.RestErr) {
+func (c *usersClient) LoginUser(email string, password string) (*users.User, restErrors.RestErr) {
 	request := users.UserLoginRequest{
 		Email:    email,
 		Password: password,
@@ -42,7 +42,7 @@ func (c *usersClient) LoginUser(email string, password string) (*users.User, *re
 		if err := json.Unmarshal(response.Bytes(), &restErr); err != nil {
 			return nil, restErrors.NewInternalServerError("invalid error interface when trying to login user")
 		}
-		return nil, &restErr
+		return nil, restErr
 	}
 
 	var user users.User
