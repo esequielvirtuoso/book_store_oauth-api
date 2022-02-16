@@ -11,15 +11,15 @@ import (
 )
 
 type Repository interface {
-	GetById(string) (*accesstoken.AccessToken, *restErrors.RestErr)
-	Create(accesstoken.AccessToken) *restErrors.RestErr
-	UpdateExpirationTime(accesstoken.AccessToken) *restErrors.RestErr
+	GetById(string) (*accesstoken.AccessToken, restErrors.RestErr)
+	Create(accesstoken.AccessToken) restErrors.RestErr
+	UpdateExpirationTime(accesstoken.AccessToken) restErrors.RestErr
 }
 
 type Service interface {
-	GetById(string) (*accesstoken.AccessToken, *restErrors.RestErr)
-	Create(accesstoken.AccessTokenRequest) (*accesstoken.AccessToken, *restErrors.RestErr)
-	UpdateExpirationTime(accesstoken.AccessToken) *restErrors.RestErr
+	GetById(string) (*accesstoken.AccessToken, restErrors.RestErr)
+	Create(accesstoken.AccessTokenRequest) (*accesstoken.AccessToken, restErrors.RestErr)
+	UpdateExpirationTime(accesstoken.AccessToken) restErrors.RestErr
 }
 
 type service struct {
@@ -34,7 +34,7 @@ func NewService(userRepo rest.UsersClient, dbRepo db.DBRepository) Service {
 	}
 }
 
-func (s *service) GetById(accessTokenID string) (*accesstoken.AccessToken, *restErrors.RestErr) {
+func (s *service) GetById(accessTokenID string) (*accesstoken.AccessToken, restErrors.RestErr) {
 	accessTokenID = strings.TrimSpace(accessTokenID)
 	if len(accessTokenID) == 0 {
 		return nil, restErrors.NewBadRequestError("invalid access token id")
@@ -51,7 +51,7 @@ func (s *service) GetById(accessTokenID string) (*accesstoken.AccessToken, *rest
 	return accessToken, nil
 }
 
-func (s *service) Create(request accesstoken.AccessTokenRequest) (*accesstoken.AccessToken, *restErrors.RestErr) {
+func (s *service) Create(request accesstoken.AccessTokenRequest) (*accesstoken.AccessToken, restErrors.RestErr) {
 	if err := request.Validate(); err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (s *service) Create(request accesstoken.AccessTokenRequest) (*accesstoken.A
 	return &at, nil
 }
 
-func (s *service) UpdateExpirationTime(at accesstoken.AccessToken) *restErrors.RestErr {
+func (s *service) UpdateExpirationTime(at accesstoken.AccessToken) restErrors.RestErr {
 	if err := at.Validate(); err != nil {
 		return err
 	}

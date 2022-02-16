@@ -19,15 +19,15 @@ func NewService() DBRepository {
 }
 
 type DBRepository interface {
-	GetById(string) (*accesstoken.AccessToken, *restErrors.RestErr)
-	Create(accesstoken.AccessToken) *restErrors.RestErr
-	UpdateExpirationTime(accesstoken.AccessToken) *restErrors.RestErr
+	GetById(string) (*accesstoken.AccessToken, restErrors.RestErr)
+	Create(accesstoken.AccessToken) restErrors.RestErr
+	UpdateExpirationTime(accesstoken.AccessToken) restErrors.RestErr
 }
 
 type dbRepository struct {
 }
 
-func (r *dbRepository) GetById(id string) (*accesstoken.AccessToken, *restErrors.RestErr) {
+func (r *dbRepository) GetById(id string) (*accesstoken.AccessToken, restErrors.RestErr) {
 	var result accesstoken.AccessToken
 	if err := cassandra.GetSession().Query(queryGetAccessToken, id).Scan(&result.AccessToken,
 		&result.UserID,
@@ -42,7 +42,7 @@ func (r *dbRepository) GetById(id string) (*accesstoken.AccessToken, *restErrors
 	return &result, nil
 }
 
-func (r *dbRepository) Create(at accesstoken.AccessToken) *restErrors.RestErr {
+func (r *dbRepository) Create(at accesstoken.AccessToken) restErrors.RestErr {
 	if err := cassandra.GetSession().Query(queryInsertAccessToken,
 		at.AccessToken,
 		at.UserID,
@@ -54,7 +54,7 @@ func (r *dbRepository) Create(at accesstoken.AccessToken) *restErrors.RestErr {
 	return nil
 }
 
-func (r *dbRepository) UpdateExpirationTime(at accesstoken.AccessToken) *restErrors.RestErr {
+func (r *dbRepository) UpdateExpirationTime(at accesstoken.AccessToken) restErrors.RestErr {
 	if err := cassandra.GetSession().Query(queryUpdateExpires, at.AccessToken).Exec(); err != nil {
 		return restErrors.NewInternalServerError(err.Error())
 	}
