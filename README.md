@@ -25,7 +25,14 @@ User is the core domain of this application.
 
 ### Environment variables
 
-None
+```
+export USER_API_URL=http://localhost:5001 &&
+
+export OAUTH_CASSANDRA_HOST=127.0.0.1 &&
+
+export OAUTH_CASSANDRA_PORT=9043
+```
+
 
 ### Installing and running locally
 ```shell script

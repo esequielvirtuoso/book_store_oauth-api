@@ -22,7 +22,10 @@ CASSANDRA_NAME = cassandra_$(NAME)_$(BUILD)
 # However, we have set it up with a static name to simplify the local
 # connection tests between the apps containers
 NETWORK_NAME = network_book_store
-MYSQL_URL = root:passwd@tcp(127.0.0.1:3305)/users_db?charset=utf8
+
+USER_API_URL=http://book_store_users-api:8081
+OAUTH_CASSANDRA_HOST=cassandra
+OAUTH_CASSANDRA_PORT="9042"
 
 check-used-ports:
 	sudo netstat -tulpn | grep LISTEN
@@ -75,7 +78,9 @@ test: ##@check Run tests and coverage.
 	docker build --progress=plain \
 		--network $(NETWORK_NAME) \
 		--tag $(IMAGE) \
-		--build-arg MYSQL_URL="$(MYSQL_URL)" \
+		--build-arg USER_API_URL="${USER_API_URL}" \
+		--build-arg OAUTH_CASSANDRA_HOST="${OAUTH_CASSANDRA_HOST}" \
+		--build-arg OAUTH_CASSANDRA_PORT=${OAUTH_CASSANDRA_PORT} \
 		--target=test \
 		--file=Dockerfile .
 
@@ -119,15 +124,19 @@ run:
 	go run src/main.go
 
 run-local: ##@dev Run locally.
-	MYSQL_URL="$(CASSANDRA_NAME)" \
+	USER_API_URL="${USER_API_URL}" \
+	OAUTH_CASSANDRA_HOST="${OAUTH_CASSANDRA_HOST}" \
+	OAUTH_CASSANDRA_PORT=${OAUTH_CASSANDRA_PORT} \
 	run
 
-run-docker: check-env-MYSQL_URL ##@docker Run docker container.
+run-docker: check-env-USER_API_URL check-env-OAUTH_CASSANDRA_HOST check-env-OAUTH_CASSANDRA_PORT ##@docker Run docker container.
 	docker run --rm \
 		--name $(NAME) \
 		--network $(NETWORK_NAME) \
 		-e LOGGER_LEVEL=debug \
-		-e MYSQL_URL="root:passwd@tcp(mysql_db:3306)/users_db?charset=utf8" \
+		-e USER_API_URL="${USER_API_URL}" \
+		-e OAUTH_CASSANDRA_HOST="${OAUTH_CASSANDRA_HOST}" \
+		-e OAUTH_CASSANDRA_PORT=${OAUTH_CASSANDRA_PORT} \
 		-p 5002:8082 \
 		$(IMAGE)
 

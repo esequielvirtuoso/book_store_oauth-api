@@ -41,7 +41,7 @@ COPY . .
 ARG VERSION
 ARG BUILD
 ARG DATE
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -installsuffix cgo -o /go/bin/book_store_oauth-api  -ldflags "-X main.version=${VERSION} -X main.build=${BUILD} -X main.date=${DATE}" ./
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -installsuffix cgo -o /go/bin/book_store_oauth-api  -ldflags "-X main.version=${VERSION} -X main.build=${BUILD} -X main.date=${DATE}" ./src
 
 # --- Release ----
 FROM gcr.io/distroless/base-debian10 AS image

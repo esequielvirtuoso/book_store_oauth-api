@@ -8,12 +8,17 @@ import (
 	"github.com/mercadolibre/golang-restclient/rest"
 
 	"github.com/esequielvirtuoso/book_store_oauth-api/src/domain/users"
+	env "github.com/esequielvirtuoso/go_utils_lib/envs"
 	restErrors "github.com/esequielvirtuoso/go_utils_lib/rest_errors"
+)
+
+const (
+	envUserAPIURL = "USER_API_URL"
 )
 
 var (
 	usersRestClient = rest.RequestBuilder{
-		BaseURL: "http://localhost:5001",
+		BaseURL: getUserAPIURL(),
 		Timeout: 100 * time.Millisecond,
 	}
 )
@@ -25,6 +30,7 @@ type UsersClient interface {
 type usersClient struct{}
 
 func NewClient() UsersClient {
+	env.CheckRequired(envUserAPIURL)
 	return &usersClient{}
 }
 
@@ -38,11 +44,11 @@ func (c *usersClient) LoginUser(email string, password string) (*users.User, res
 		return nil, restErrors.NewInternalServerError("invalid rest client response when trying to login user", nil)
 	}
 	if response.StatusCode > 299 {
-		var restErr restErrors.RestErr
-		if err := json.Unmarshal(response.Bytes(), &restErr); err != nil {
+		apiErr, err := restErrors.NewRestErrorFromBytes(response.Bytes())
+		if err != nil {
 			return nil, restErrors.NewInternalServerError("invalid error interface when trying to login user", err)
 		}
-		return nil, restErr
+		return nil, apiErr
 	}
 
 	var user users.User
@@ -50,4 +56,8 @@ func (c *usersClient) LoginUser(email string, password string) (*users.User, res
 		return nil, restErrors.NewInternalServerError("error when trying to unmarshal users response", err)
 	}
 	return &user, nil
+}
+
+func getUserAPIURL() string {
+	return env.GetString(envUserAPIURL)
 }
